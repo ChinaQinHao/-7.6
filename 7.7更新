@@ -1,0 +1,263 @@
+import xlrd
+import matplotlib.pyplot as plt
+# import numpy as np
+from matplotlib import font_manager
+# 导入模块
+import os
+import numpy as np
+
+
+plt.rcParams['font.sans-serif'] = ['SimHei']  # 解决中文显示问题
+plt.rcParams['axes.unicode_minus'] = False  # 解决中文显示问题
+
+my_font = font_manager.FontProperties(fname="C:\Windows\Fonts\msyh.ttc")
+work_book = xlrd.open_workbook('成绩单.xls')  # 读取成绩单
+
+x_axis_data = []
+
+y_axis_data = []
+sheet_1 = work_book.sheet_by_index(0)
+'''
+student=[]
+colors = ['bs--', 'yo--', 'r*--', 'c+--', 'g^--']
+name = ['尹永杰', '宋志楠', '秦昊', '李勇昊', '柏昕彤']
+
+
+for i in range(1,6):
+    for j in range(1,9):
+        cell_0 = sheet_1.cell_value(i, j)
+        student.append(cell_0)
+    y_axis_data.append(student)
+    student=[]
+for i in range(1,9):
+    cell_1 = sheet_1.cell_value(0, i)
+    x_axis_data.append(cell_1)
+
+print(x_axis_data)
+print(y_axis_data)
+
+
+
+for i in range(5):
+    plt.plot(x_axis_data, y_axis_data[i], colors[i],
+             alpha=0.5, linewidth=1, label=(name[i]))
+    # 'bo-'表示蓝色实线，数据点实心原点标注
+## plot中参数的含义分别是横轴值，纵轴值，线的形状（'s'方块,'o'实心圆点，'*'五角星   ...，颜色，透明度,线的宽度和标签 ，
+
+plt.legend()  # 显示上面的label
+plt.xlabel('科目',fontproperties=my_font)  # x_label
+plt.ylabel('成绩', fontproperties=my_font)  # y_label
+
+
+plt.xticks(x_axis_data, fontproperties=my_font)
+
+plt.legend(prop=my_font)
+#plt.ylim(-1,1)#仅设置y轴坐标范围
+plt.show()
+
+'''
+
+def 保存分段与个人对比():
+    # 这两行代码解决 plt 中文显示的问题
+    plt.rcParams['font.sans-serif'] = ['SimHei']
+    plt.rcParams['axes.unicode_minus'] = False
+
+    # 输入统计数据
+    科目名称 = list(科目name)[:8]
+    分段成绩 = 各科分段平均分[:8]
+    个人成绩 = 个人各科成绩[:8]
+
+    bar_width = 0.4  # 条形宽度
+    index_male = np.arange(len(科目名称))  # 分段条形图的横坐标
+    index_female = index_male + bar_width  # 个人条形图的横坐标
+
+    # 使用两次 bar 函数画出两组条形图
+    plt.bar(index_male, height=分段成绩, width=bar_width, color='steelblue', label='分段平均成绩')
+    plt.bar(index_female, height=个人成绩, width=bar_width, color='indianred', label='你的成绩')
+
+    plt.legend()  # 显示图例
+    plt.xticks(index_male + bar_width/2, 科目名称)  # 让横坐标轴刻度显示
+    plt.ylabel('分数')  # 纵坐标轴标题
+    plt.title('第{0}分段平均成绩与你的成绩对比'.format(所处分段))  # 图形标题
+    plt.savefig('{0}/各科成绩对比.jpg'.format(username))  # 保存图片
+    plt.close()
+
+
+def 各科全班与分段对比():
+    科目名称 = list(科目name)[:8]
+    分段成绩 = 各科分段平均分[:8]
+    全班成绩 = 各科全班平均分[:8]
+    个人成绩 = 个人各科成绩[:8]
+    waters = ('全班平均', '分段平均', '你的成绩')
+    颜色 = ['orange', 'cornflowerblue', 'limegreen']
+
+    for i in range(8):
+        buy_number = [分段成绩[i], 全班成绩[i], 个人成绩[i]]
+        plt.bar(waters, buy_number, color=颜色)
+        plt.title('{0}成绩的对比图'.format(科目名称[i]))
+        plt.savefig('{0}/{1}成绩对比.jpg'.format(username,科目名称[i]))  # 保存图片
+        plt.close()
+
+
+# 创建文件夹
+def 创建文件夹(path):
+    folder = os.path.exists(path)
+
+    if not folder:  # 判断是否存在文件夹如果不存在则创建为文件夹
+        os.makedirs(path)  # makedirs 创建文件时如果路径不存在会创建这个路径
+
+        print("---  创建文件夹成功  ---")
+
+    else:
+        print("---  文件夹被创建过了！  ---")
+
+
+def 显示并保存图片():
+    for i in range(9):
+        #饼状图占比
+        fraces = [58 - 个人各科成绩排名[i], 个人各科成绩排名[i]]
+        #设置显示方式为标准圆
+        plt.axes(aspect=1)
+        #设置两个数据得文字说明
+        plt.pie(x=fraces, autopct='%3.1f%%', labels=['您超过的', '全班人数'])
+        #显示上部文字说明
+        plt.title(科目name[i] + '超过全班')
+        #设置图片
+        photo = '{1}/{0}{1}.jpg'.format(科目name[i], username)
+        plt.savefig(photo)  # 保存图片
+        # plt.show()
+        plt.close()
+
+
+# 按列读取
+data_col = [sheet_1.col_values(i) for i in range(sheet_1.ncols)]
+# 按行读取
+data_row = []
+for row in range(sheet_1.nrows):
+    data_row.append(sheet_1.row_values(row))
+# print(data_col)
+#删除第一横排第一项：姓名
+data_row[0].pop(0)
+# 设置全班名字，删除第一竖排第0项‘姓名’
+allname = data_col[0]
+allname.pop(0)
+科目 = ['yuwen', 'shuxue', 'yingyu', 'zhengzhi', 'lishi', 'dili', 'shenngwu', 'wuli','zongfen']
+科目name = tuple(data_row[0])
+各科成绩排名 = []
+科目字典 = data_row[0]
+各科全班平均分=[]
+各科分段平均分=[]
+for i in range(9):
+
+    # 读取各科成绩单
+    科目[i] = data_col[i + 1]
+    #删除此列第一项（第一项为科目名称，转为纯数字列表来排序）
+    科目[i].pop(0)
+    #排序
+    各科成绩排名.append(sorted(科目[i], reverse=True))
+    # 把姓名与各科成绩结合成字典
+    科目[i] = zip(allname, 科目[i])
+    # yuwen.sort(reverse = True)
+
+    科目[i] = dict(科目[i])
+    科目字典[i] = dict(科目[i])
+
+    科目[i] = sorted(科目[i].items(), key=lambda x: x[1], reverse=True)
+    #计算平均分
+    各科目成绩 = data_col[i+1]
+    各科全班平均分.append(sum(各科目成绩) / len(allname))
+
+
+    # print(科目name[i],科目[i])
+
+# print(各科成绩排名)
+
+
+
+个人各科成绩 = list(科目name)#读取各个科目
+个人各科成绩排名 = []
+所处分段=0
+username = input("请输入您的姓名")
+
+if username in allname:
+    print('查询到以下结果')
+
+
+
+
+    #处理各科分数
+    for i in range(9):
+        #print(科目字典)
+        #读取个人各科成绩，前面已经准备好各人对应的各科成绩
+        个人各科成绩[i] = 科目字典[i].get(username)
+        #将个人各科排名添加进列表
+        个人各科成绩排名.append(各科成绩排名[i].index(个人各科成绩[i]))
+        print(科目name[i], 个人各科成绩[i])
+
+
+
+
+    #处理分段分数
+    #获取个人分段
+    所处分段 = (个人各科成绩排名[-1] + 1) // 10
+    for i in range(9):
+
+
+        #计算平均分
+        各科目成绩 = data_col[i+1][(所处分段)*10:(所处分段+1)*10+1]
+        #print(各科目成绩)
+        #print((所处分段)*10,(所处分段+1)*10)
+
+        各科分段平均分.append(sum(各科目成绩) / len(各科目成绩))
+    # print(科目name)
+
+
+    # print()
+    # print(个人各科成绩)
+
+
+
+
+        # 创建文件夹
+        # 调用函数
+    file = "{0}".format(username)
+    创建文件夹(file)
+    显示并保存图片()  # 这是个函数！！！！！！！！！！在前面定义的
+    保存分段与个人对比()
+    各科全班与分段对比()
+
+
+    # print(各科全班平均分)
+    # print(
+    # )
+    # print(各科分段平均分)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+else:
+    print('对不起，没有找到相关学生')
+
+
+# print(个人各科成绩排名)
+
+
+
+
+
+
